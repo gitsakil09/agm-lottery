@@ -1,5 +1,7 @@
 /**
  * index.js file
+ * Author: Sk Sakil Ahmed
+ * Email: sakil.ruet09@gmail.com
  */
 let sectors = [];
 // generating large sectors
