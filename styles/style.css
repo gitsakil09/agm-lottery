@@ -8,6 +8,7 @@
   display: inline-block;
   position: relative;
   overflow: hidden;
+  margin-left: 5%;
 }
 
 #wheel {

@@ -146,7 +146,7 @@ function processWinner(sector) {
         popup: "animate__animated animate__fadeOutUp",
       },
       // background: "#fff url(./lottery3.gif)",
-      backdrop: `rgba(0,0,123,0.4) url("./lottery5.gif") no-repeat
+      backdrop: `rgba(0,0,123,0.4) url("./images/lottery5.gif") no-repeat
   `,
       icon: "warning",
       // showCancelButton: true,
