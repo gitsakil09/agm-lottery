@@ -31,22 +31,8 @@
         </section>
       </div>
       <!-- End of Curtain -->
-      <!-- <div id="wheelOfFortune">
-          <canvas id="wheel" width="600" height="600"></canvas>
-          <div id="spin">SPIN</div>
-        </div> -->
-      <!-- </v-card> -->
     </v-col>
-    <v-col cols="4" sm="12" md="4">
-      <v-card class="justify-center">
-        <!-- Showing the Position List -->
-        <div class="position">
-          <p id="3"></p>
-          <p id="2"></p>
-          <p id="1"></p>
-        </div>
-      </v-card>
-    </v-col>
+
     <!-- Result Dialog -->
     <v-dialog v-model="dialog" width="500">
       <v-card>
@@ -84,13 +70,13 @@
 import Swal from 'sweetalert2'
 import randomColor from 'randomcolor'
 import 'sweetalert2/dist/sweetalert2.min.css'
-import authors from '~/data.json'
+import consumers from '~/consumerData.json'
 // const fs = require('fs')
 
 export default {
   name: 'IndexPage',
-  asyncData({ params }) {
-    return { authors }
+  asyncData() {
+    return { consumers }
   },
   data() {
     return {
@@ -115,6 +101,7 @@ export default {
     }
   },
   async mounted() {
+    // this.removingDuplicateList()
     /** End of Testing file writing */
     this.$nuxt.$on('startLottery', this.startLottery)
     this.$nuxt.$on('showResult', this.showResult)
@@ -151,26 +138,44 @@ export default {
       this.TAU = 2 * this.PI
 
       // generating large sectors based on data file
-      for (let index = 0; index < 50; index++) {
+      this.consumers.map(
+        (consumer) => (consumer.smsNo = consumer.bookNo + consumer.accountNo)
+      )
+      // console.log(this.consumers)
+      const result = []
+      const map = new Map()
+      for (const item of this.consumers) {
+        if (!map.has(item.smsNo)) {
+          map.set(item.smsNo, true) // set any value to Map
+          result.push(item)
+        }
+      }
+      // console.log(result)
+      this.consumers = result
+      // shuffling the object
+      this.consumers.sort(() => Math.random() - 0.5)
+      // console.log(this.consumers)
+      // for (let index = 0; index < 50; index++) {
+      for (let index = 0; index < this.consumers.length; index++) {
         const color = randomColor() // a hex code for an attractive color
         // console.log(color)
-        // this.sectors.push({
-        //   color,
-        //   bookNo: Number(this.authors[index].bookNo).toLocaleString('bn-BD'),
-        //   accountNo: Number(this.authors[index].accountNo).toLocaleString(
-        //     'bn-BD'
-        //   ),
-        //   name: this.authors[index].name,
-        //   mobileNo: this.authors[index].mobileNo,
-        //   officeName: this.authors[index].officeName,
-        // })
         this.sectors.push({
           color,
-          bookNo: (index + 1).toLocaleString('bn-BD'),
-          accountNo: (index + 1000).toLocaleString('bn-BD'),
-          name: `Mr. ${index + 1}`,
-          mobileNo: '01857319767',
+          bookNo: Number(this.consumers[index].bookNo).toLocaleString('bn-BD'),
+          accountNo: Number(this.consumers[index].accountNo).toLocaleString(
+            'bn-BD'
+          ),
+          name: this.consumers[index].name,
+          mobileNo: this.consumers[index].mobileNo,
+          officeName: this.consumers[index].officeName,
         })
+        // this.sectors.push({
+        //   color,
+        //   bookNo: (index + 1).toLocaleString('bn-BD'),
+        //   accountNo: (index + 1000).toLocaleString('bn-BD'),
+        //   name: `Mr. ${index + 1}`,
+        //   mobileNo: '01857319767',
+        // })
       }
       this.tot = this.sectors.length || 1
       this.arc = this.TAU / (this.sectors.length || 1)
@@ -250,8 +255,7 @@ export default {
       // checking the board is rotating or not
       if (this.angVel) {
         // Rotating
-        this.EL_spin.textContent = `${sector.name}
-    (${sector.bookNo}/${sector.accountNo})`
+        this.EL_spin.textContent = `(${sector.bookNo}/${sector.accountNo})`
         // Showing the sweetalert
         // Swal.fire(`The this.winner is ${sector.bookNo}`);
         this.winner = sector
@@ -377,10 +381,10 @@ export default {
                 processedPosition
               )
               // Sending the Winning SMS to the consumer mobile no
-              await this.sendSMSToMobile(
-                this.sectors[findIndex],
-                processedPosition
-              )
+              // await this.sendSMSToMobile(
+              //   this.sectors[findIndex],
+              //   processedPosition
+              // )
               this.sectors.splice(findIndex, 1)
               // Redrawing the Canvas
               this.initializeVariables()
@@ -438,7 +442,7 @@ export default {
         const SMS_USER = 'bholapbs' // 'dhakapbs3'
         const SMS_PASSWORD = 'bholapbs' // 'dhakapbs3'
         const SMS_MOBILE = mobileNo
-        const SMS_CONTENT = `অভিনন্দন ${name}।আপনি ${position} পুরষ্কারের জন্য মনোনীত হয়েছেন।`
+        const SMS_CONTENT = `অভিনন্দন ${name}।ভোলা পল্লী বিদ্যুৎ সমিতির পক্ষ থেকে আপনি ${position} পুরষ্কারের জন্য মনোনীত হয়েছেন।`
         const SMS_CHARSET = 'UTF-8'
         const processedURL = `http://bulksms2.teletalk.com.bd/link_sms_send.php?op=SMS&user=${SMS_USER}&pass=${SMS_PASSWORD}&mobile=88${SMS_MOBILE}&sms=${SMS_CONTENT}&charset=${SMS_CHARSET}`
         // Sending OTP to the Provided Number
@@ -458,6 +462,30 @@ export default {
       } catch (error) {
         console.log(error)
         // ERROR
+      }
+    },
+    /**
+     * Removing the duplicate account frm data list
+     */
+    removingDuplicateList() {
+      try {
+        // console.log(this.consumers)
+        this.consumers.map(
+          (consumer) => (consumer.smsNo = consumer.bookNo + consumer.accountNo)
+        )
+        // console.log(this.consumers)
+        const result = []
+        const map = new Map()
+        for (const item of this.consumers) {
+          if (!map.has(item.smsNo)) {
+            map.set(item.smsNo, true) // set any value to Map
+            result.push(item)
+          }
+        }
+        console.log(result)
+        this.consumers = result
+      } catch (error) {
+        console.log(error)
       }
     },
   },
