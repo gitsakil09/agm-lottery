@@ -1,5 +1,10 @@
 <template>
   <v-row justify="center" align="center">
+    <v-col cols="12" sm="8" md="8">
+      মোট অংশগ্রহণকারী গ্রাহকঃ {{ consumers.length.toLocaleString('bn-BD') }}
+      <v-spacer></v-spacer> মোট বর্তমান গ্রাহকঃ
+      {{ sectors.length.toLocaleString('bn-BD') }}
+    </v-col>
     <v-col cols="12" sm="12" md="12" style="padding: 0px">
       <!-- <v-col cols="12" sm="8" md="8"> -->
       <!-- Curtain -->
@@ -32,7 +37,6 @@
       </div>
       <!-- End of Curtain -->
     </v-col>
-
     <!-- Result Dialog -->
     <v-dialog v-model="dialog" width="500">
       <v-card>
@@ -166,7 +170,11 @@ export default {
             'bn-BD'
           ),
           name: this.consumers[index].name,
-          mobileNo: this.consumers[index].mobileNo,
+          mobileNo:
+            this.consumers[index].mobileNo &&
+            this.consumers[index].mobileNo.length === 10
+              ? '0' + this.consumers[index].mobileNo
+              : this.consumers[index].mobileNo,
           officeName: this.consumers[index].officeName,
         })
         // this.sectors.push({
@@ -381,10 +389,10 @@ export default {
                 processedPosition
               )
               // Sending the Winning SMS to the consumer mobile no
-              // await this.sendSMSToMobile(
-              //   this.sectors[findIndex],
-              //   processedPosition
-              // )
+              await this.sendSMSToMobile(
+                this.sectors[findIndex],
+                processedPosition
+              )
               this.sectors.splice(findIndex, 1)
               // Redrawing the Canvas
               this.initializeVariables()
