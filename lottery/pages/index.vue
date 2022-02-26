@@ -447,12 +447,12 @@ export default {
      */
     async sendSMSToMobile({ name, mobileNo }, position) {
       try {
-        const SMS_USER = 'bholapbs' // 'dhakapbs3'
-        const SMS_PASSWORD = 'bholapbs' // 'dhakapbs3'
+        const SMS_USER = ''
+        const SMS_PASSWORD = ''
         const SMS_MOBILE = mobileNo
         const SMS_CONTENT = `অভিনন্দন ${name}।ভোলা পল্লী বিদ্যুৎ সমিতির পক্ষ থেকে আপনি ${position} পুরষ্কারের জন্য মনোনীত হয়েছেন।`
         const SMS_CHARSET = 'UTF-8'
-        const processedURL = `http://bulksms2.teletalk.com.bd/link_sms_send.php?op=SMS&user=${SMS_USER}&pass=${SMS_PASSWORD}&mobile=88${SMS_MOBILE}&sms=${SMS_CONTENT}&charset=${SMS_CHARSET}`
+        const processedURL = ``
         // Sending OTP to the Provided Number
         await this.$axios
           .$get(encodeURI(processedURL))
